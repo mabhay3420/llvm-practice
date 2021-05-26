@@ -1,4 +1,11 @@
-#include <bits/stdc++.h>
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 // if invalid token lexer returns [0-255]
 // otherwise one of following
@@ -69,15 +76,6 @@ static int gettok() {
   // for next gettok call
   LastChar = getchar();
   return ThisChar;
-}
-
-int main() {
-  int last = 0;
-  while (last != -1) {
-    last = gettok();
-    std::cout << last << std::endl;
-  }
-  return 0;
 }
 /** The Abstract Syntax Tree
  * One object for each construct(Node) in the language
@@ -177,6 +175,8 @@ std::unique_ptr<PrototypeAST> LogErrorP(const char *Str) {
 
 /// Basic Expression Parsing
 /// numberexpr ::= number
+
+static std::unique_ptr<ExprAST> ParseExpression();
 static std::unique_ptr<ExprAST> ParseNumberExpr() {
   auto Result = std::make_unique<NumberExprAST>(NumVal);
   getNextToken(); // consume the number
@@ -254,6 +254,8 @@ static std::unique_ptr<ExprAST> ParsePrimary() {
 /// BinoPrecedence - This holds the precedence for
 /// each binary operator that is defined.
 
+static std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec,
+                                              std::unique_ptr<ExprAST> LHS);
 static std::map<char, int> BinopPrecedence;
 
 /// GetTokPrecedence - Get the precedence of the pending
@@ -370,6 +372,7 @@ static std::unique_ptr<FunctionAST> ParseTopLevelExpr() {
     auto Proto = std::make_unique<PrototypeAST>("", std::vector<std::string>());
     return std::make_unique<FunctionAST>(std::move(Proto), std::move(E));
   }
+  return nullptr;
 }
 
 /** Top Level Parsing
@@ -421,7 +424,7 @@ static void MainLoop() {
       HandleExtern();
       break;
     default:
-      HandleTopLevelExpression;
+      HandleTopLevelExpression();
       break;
     }
   }
