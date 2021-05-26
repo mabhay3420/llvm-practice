@@ -81,8 +81,8 @@ static int gettok() {
  * One object for each construct(Node) in the language
  */
 
+namespace {
 /// ExprAST - Base Class for all expression Nodes
-
 class ExprAST {
 public:
   virtual ~ExprAST() {}
@@ -152,6 +152,7 @@ public:
               std::unique_ptr<ExprAST> Body)
       : Proto(std::move(Proto)), Body(std::move(Body)) {}
 };
+} // end anonymous namespace
 
 /** Parsing Basics
  * Convert list of tokens to AST
